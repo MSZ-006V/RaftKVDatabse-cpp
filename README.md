@@ -1,1 +1,1 @@
-# RaftKVDatabse-cpp
+# Distributed KV database based on Raft consensus algorithm
