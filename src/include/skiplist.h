@@ -6,6 +6,10 @@
 #include <fstream>
 #include <iostream>
 #include <mutex>
+#include <vector>
+#include <boost/serialization/access.hpp>
+
+static std::string delimiter = ":";
 
 template<typename K, typename V>
 class node{
@@ -23,7 +27,7 @@ public:
 
 private:
     K key;
-    V value
+    V value;
 };
 
 // & 是Boost库对序列化操作符的重载，用于同时支持序列化和反序列化

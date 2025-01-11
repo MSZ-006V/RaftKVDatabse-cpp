@@ -1,0 +1,3 @@
+"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\raftKVcpp.dir/objects.a
+D:\CodeLanguageCompiler\x86_64-14.2.0-release-win32-seh-msvcrt-rt_v12-rev0\mingw64\bin\ar.exe qc CMakeFiles\raftKVcpp.dir/objects.a @CMakeFiles\raftKVcpp.dir\objects1.rsp
+g++ -Wl,--whole-archive CMakeFiles\raftKVcpp.dir/objects.a -Wl,--no-whole-archive -o raftKVcpp.exe -Wl,--out-implib,libraftKVcpp.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\raftKVcpp.dir\linkLibs.rsp

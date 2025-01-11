@@ -1,6 +1,5 @@
-# pragma once
-
 #include"skiplist.h"
+#include"config.h"
 
 template<typename K, typename V>
 node<K, V>::node(K key, V val, int level){
@@ -66,56 +65,154 @@ SkipList<K, V>::~SkipList(){
 
 template<typename K, typename V>
 void SkipList<K, V>::displayList(){
-
+    if(DEBUG){ // only display under DEBUG mode, define in config.h
+        std::cout << "\nSkipList display\n";
+        for(int i = 0; i < skiplist_level; ++i){
+            node<K, V> *node = this->head->forward[i];
+            std::cout << "Level " << i << ": ";
+            while(node != nullptr){
+                std::cout << node->getKey() << ":" << node->getVal() << ";";
+                node = node->forward[i];
+            }
+            std::cout << std::endl;
+        }
+    }
 }
 
 
 template<typename K, typename V>
 int SkipList<K, V>::getRandomLevel(){
-
+    int k = 1;
+    while(rand() % 2){
+        k++;
+    }
+    k = (k < max_level)? k : max_level;
+    return k;
 }
 
 template<typename K, typename V>
 node<K, V> *SkipList<K, V>::createNode(K k, V v, int level){
-
+    node<K, V> *n = new node<K, V>(k, v, level);
+    return n;
 }
 
 template<typename K, typename V>
-int SkipList<K, V>::insertElement(K k, V v){
+int SkipList<K, V>::insertElement(K key, V val){
+    std::lock_guard<std::mutex> lock(m_mtx);
+    node<K, V> *cur = this->head;
 
+    node<K, V> *update[max_level + 1];
+    memset(update, 0, sizeof(node<K, V> *) * (max_level + 1));
+
+    for(int i = skiplist_level; i >= 0; --i){
+        while(cur->forward[i] != nullptr && cur->forward[i]->getKey() < key){
+            cur = cur->forward[i];
+        }
+        update[i] = cur;
+    }
+
+    cur = cur->forward[0];
+    if(cur != nullptr && cur->getKey() == key){
+        std::cout << "key: " << key << ", exists" << std::endl;
+        return 1;
+    }
+
+    if(cur == nullptr || cur->getKey() != key){
+        int randomLevel = getRandomLevel();
+        if(randomLevel > skiplist_level){
+            for(int i = skiplist_level + 1; i < randomLevel + 1; ++i){
+                update[i] = head;
+            }
+            skiplist_level = randomLevel;
+        }
+
+        node<K, V>* insertedNode = createNode(key, val, randomLevel);
+        for(int i = 0; i < randomLevel; ++i){
+            insertedNode->forward[i] = update[i]->forward[i];
+            update[i]->forward[i] = insertedNode;
+        }
+        std::cout << "Insert Successfully" << std::endl;
+        skiplist_element_count++;
+    }
+
+    return 0;
 }
 
+// ! 似乎val是多余的变量，搜索不需要val
 template<typename K, typename V>
-bool SkipList<K, V>::searchElement(K k, V &v){
+bool SkipList<K, V>::searchElement(K key, V &val){
+    std::cout << "-----------------Element searching now-----------------" << std::endl;
+    node<K, V> *cur = head;
 
+    // start from the highest level of skiplist
+    for(int i = skiplist_level; i >= 0; --i){
+        while(cur->forward[i] && cur->forward[i]->getKey() < key){
+            cur = cur->forward[i];
+        }
+    }
+
+    cur = cur->forward[0];
+    if(cur && cur->getKey() == key){
+        val = cur->getval();
+        std::cout << "Found key: " << key << ", value: " << val << std::endl;
+        return true;
+    }
+
+    std::cout << " Not Found key: " << key << std::endl;
+    return false;
 }
 
 template<typename K, typename V>
 void SkipList<K, V>::deleteElement(K k){
+    std::lock_guard<std::mutex> lock(m_mtx);
 
+    return;
 }
 
 template<typename K, typename V>
-void SkipList<K, V>::insertSetElement(K &k, V &v){
-
+void SkipList<K, V>::insertSetElement(K &key, V &val){
+    V nullval;
+    if(searchElement(key, nullval)){
+        deleteElement(key);
+    }
+    insertElement(key, val);
 }
 
 template<typename K, typename V>
 std::string SkipList<K, V>::dumpFile(){
-
+    return "";
 }
 
 template<typename K, typename V>
 void SkipList<K, V>::loadFile(const std::string &dumpStr){
-
+    return;
 }
 
 template<typename K, typename V>
 void SkipList<K, V>::clear(node<K, V> *node){
-
+    if(node->forward[0] != nullptr){
+        clear(node->forward[0]);
+    }
+    delete (node);
 }
 
 template<typename K, typename V>
 int SkipList<K, V>::size(){
+    return skiplist_element_count;
+}
 
+template<typename K, typename V>
+void SkipList<K, V>::getKeyValuefromString(const std::string &str, std::string *key, std::string *value){
+    if(isValidString(str)){
+        return;
+    }
+    *key = str.substr(0, str.find(delimiter));
+    *value = str.substr(str.find(delimiter) + 1, str.length());
+}
+
+template<typename K, typename V>
+bool SkipList<K, V>::isValidString(const std::string &str){
+    if(str.empty()) return false;
+    if(str.find(delimiter) == std::string::npos) return false;
+    return true;
 }
