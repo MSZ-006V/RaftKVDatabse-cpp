@@ -180,12 +180,36 @@ void SkipList<K, V>::insertSetElement(K &key, V &val){
 
 template<typename K, typename V>
 std::string SkipList<K, V>::dumpFile(){
-    return "";
+    if(DEBUG){
+        std::cout << "-----------------dump file-----------------" << std::endl;
+    }
+    node<K, V> *node = this->head->forward[0];
+    SkipListDump<K, V> dumper;
+    while(node != nullptr){
+        dumper.insert(*node);
+        node = node->forward[0];
+    }
+    std::stringstream ss;
+    boost::archive::text_oarchive oa(ss);
+    oa << dumper;
+    return ss.str();
 }
 
 template<typename K, typename V>
 void SkipList<K, V>::loadFile(const std::string &dumpStr){
-    return;
+    if(DEBUG){
+        std::cout << "-----------------load file-----------------" << std::endl;
+    }
+    if(dumpStr.empty()){
+        return;
+    }
+    SkipListDump<K, V> loader;
+    std::stringstream iss(loader);
+    boost::archive::text_iarchive ia(iss);
+    ia >> loader;
+    for(int i = 0; i < loader.keyDumpVT_.size(); ++i){
+        insertElement(loader.keyDumpVT_[i], loader.valDumpVT_[i]);
+    }
 }
 
 template<typename K, typename V>
