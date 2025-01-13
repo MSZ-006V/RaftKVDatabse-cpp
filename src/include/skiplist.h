@@ -22,6 +22,8 @@ public:
     V getVal() const;
     void setValue(V val);
 
+    // forward是一个指针，指向的对象是一个指针数组（数组中存储的都是指针）
+    // 利用forward来管理多层链表
     node<K, V> **forward;
     int node_level;
 
@@ -35,7 +37,7 @@ private:
 // 自动决定执行序列化还是反序列化功能
 // & 是序列化流程的核心操作符，通过自动判断archive类型实现双向数据流
 template<typename K, typename V>
-class SkipListDump{
+class SkipListDump{ // Skiplist的persis类
 public:
     friend class boost::serialization::access;
 
