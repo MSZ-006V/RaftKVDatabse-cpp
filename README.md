@@ -2,5 +2,5 @@
 
 - [x] persist class
 - [x] skiplist
-- [ ] RPC
+- [ ] RPC - working on
 - [ ] Raft Algorithm implement, include consensus algorithm, heartbeat, log replication, leader election
