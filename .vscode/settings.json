@@ -61,7 +61,8 @@
         "chrono": "cpp",
         "iomanip": "cpp",
         "sstream": "cpp",
-        "cstring": "cpp"
+        "cstring": "cpp",
+        "map": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
