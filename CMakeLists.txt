@@ -10,8 +10,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_C_COMPILER "gcc")
 set(CMAKE_CXX_COMPILER "g++")
 
-# Include directories
+# Include directories, everytime add new file or category, add this
 include_directories(${PROJECT_SOURCE_DIR}/src/include)
+include_directories(${PROJECT_SOURCE_DIR}/src/rpc/include)
 
 # Find and include Boost
 set(BOOST_ROOT "D:/CPP_Third_Lib/boost_1_87_0")
@@ -24,8 +25,9 @@ else()
     message(FATAL_ERROR "Boost not found!")
 endif()
 
-# Collect source files
+# Collect source files, everytime add new file or category, add this
 file(GLOB SRC_FILES src/*.cpp)
+file(GLOB SRC_FILES src/rpc/*.cpp)
 
 # Add executable and link Boost libraries
 add_executable(raftKVcpp main.cpp ${SRC_FILES})
