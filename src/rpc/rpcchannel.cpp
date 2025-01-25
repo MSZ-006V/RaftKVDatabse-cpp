@@ -44,6 +44,7 @@ google::protobuf::Closure *done){
     std::string service_name = sd->name();
     std::string method_name = method->name();
 
+    // SerializeToString() 用来序列化service，method，args等参数
     uint32_t args_size{};
     std::string args_str;
     if(request->SerializeToString(&args_str)){
@@ -81,6 +82,12 @@ google::protobuf::Closure *done){
 
     // 最后，将请求参数附加到send_rpc_str后面
     send_rpc_str += args_str;
+
+    // send_rpc_str structure = rpc_header_str + args_str
+    // rpc_header_str包括service_name, method_name, args_size（只有长度）
+    // args_str包括method对应的全部参数args
+    // send_rpc_str里面会包括以下信息：header_size, header_str, service_name, method_name, args_size, args_str
+    // 然后下面把这个send_rpc_str发送出去，必须是str序列化后的数据
 
     // 发送RPC request
     while(send(m_client_fd, send_rpc_str.c_str(), send_rpc_str.size(), 0) == -1){
